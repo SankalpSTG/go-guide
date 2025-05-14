@@ -140,6 +140,122 @@ myArr2 := [2]int{1, 2}
 fmt.Println(len(myArr)) //4
 fmt.Println(len(myArr2)) //2
 ```
+## Slice in Go
+Slices in simple words are dynamic arrays. Slices provide you with modularity over arrays. Creating a slice is similar to creating an array. You just don't provide the length of the array.
+```go
+var myArr []int = []int{1, 2, 3}
+myArr2 := []int{1, 2, 3, 4, 5}
+fmt.Println(myArr)
+fmt.Println(len(myArr2))
+fmt.Println(cap(myArr2))
+```
+In the above example, you can see the cap function which returns the capacity that the slice can hold currently as per the memory alloted to it. This as well is dynamic and grows with the length of the array.
+
+To append values to a slice, you can use the append function as follows:
+```go
+arr := []int(1, 2, 3, 4)
+arr = append(arr, 5)
+```
+Below are some more examples
+```go
+arr := []int{1, 2, 3, 4}
+fmt.Println(arr, len(arr), cap(arr))
+arr = append(arr, 5)
+fmt.Println(arr, len(arr), cap(arr))
+arr2 := []int{1, 2, 3}
+fmt.Println(arr2, len(arr2), cap(arr2))
+arr2 = append(arr2, 4) // Capacity changes to 6 (2x)
+// arr2 = append(arr2, 4, 5)             // Capacity changes to 6 (2x)
+// arr2 = append(arr2, 4, 5, 6)          // Capacity changes to 6 (2x)
+// arr2 = append(arr2, 4, 5, 6, 7)       // Capacity changes to 8 (2x + 2)
+// arr2 = append(arr2, 4, 5, 6, 7, 8, 9) // Capacity changes to 8 (2x + 2 + 2)
+fmt.Println(arr2, len(arr2), cap(arr2))
+fmt.Println(arr2, len(arr2), cap(arr2))
+```
+In the above examples, I noticed one thing. When you append to an array for which the length and capacity are equal, it doubles the capacity of the array.
+
+When the elements that are being added are more than the current length of the array and the length and capacity are equal, the capacity is incremented in a different way.
+
+If the length and capacity of array is 3, and you are adding 6 elements, so the final length of array will be 9.
+
+But capacity will be incremented as follows:
+1. First it will double the capacity. so 3 becomes 6.
+2. Can 9 elements fit in the capacity of 6, no... Hence now the capacity is further increased by 2 so the new capacity becomes 8.
+3. Can 9 elements fit in the capacity of 8, no... hence now the capacity is further increased by 2 so the new capacity becomes 10.
+4. Can 9 elements fit in the capacity of 10, yes. So this is the final capacity.
+
+I observed that capacity first increases by 2 x original capacity and then is incremented by 2.
+
+But once the append operation is done, and the length has gone from 3 to 9 and the capacity has become 10, if you now append again but just one value, then the capacity remains 10 and length becomes 10.
+
+However instead of one value, if you increment 2 values, the length becomes 11, which cannot fit in the capacity of 10. So now the capacity is first doubled again from 10 to 20.
+
+So the new length will be 11 and the new capacity will be 20.
+
+### Adding Slice to Slice
+```go
+arr2 = append(arr2, arr...) //adding slice to another slice
+fmt.Println(arr2, len(arr2), cap(arr2))
+```
+The above example shows how you can add a slice to a slice using the ```...``` operator.
+
+### Slicing a Slice
+```go
+arr3 := arr2[5:7]
+fmt.Println(arr, arr2, arr3)
+arr3[1] = 25 //Updates original array (arr2) as well but (arr) won't change
+fmt.Println(arr, arr2, arr3)
+```
+In the above example, we created a shorter version of the slice from index 5 to 7(not inclusive of 7). However the arr3 elements have the same reference as of arr2 and hence when you make any change in arr3, arr2 gets affected.
+
+```go
+arr3 = append(arr3, 82, 83, 84)
+fmt.Println(arr, arr2, arr3)
+```
+If you further append into arr3 like above, the effect will be as follows
+1. The length of arr2 is 9 while arr3 is indexed from 5th upto 7th index of arr2. The length of the arr3 is 2 but the capacity is 7 because you sliced upto 7 even though you took only 2 elements. The memory referencing will be as follows
+```
+mem  0  1  2  3  4  5  6  7  8  9  10
+arr2 1  2  3  4  1  2  25 4  5
+arr3                2  25 -  -  -  -  -
+```
+2. In the above example, the ```-``` represents memory reserved for arr3 elements. So you can notice that the memory reservation also starts from the 5th index of arr2. So basically for arr3, the index 7 and 8 of arr2 are actually reserved for arr3 but empty in arr3's perspective. But for arr2, those actually hold values.
+3. When you append 3 elements 82, 83 and 84... 82 and 83 take the 7th and 8th index of arr2 so the 7th and 8th index of arr2 are updated as well
+4. Now arr3 has memory reserved beyond the memory of arr2. So 84 takes next position to 83. But since arr2 does not have that memory reserved for itself, 84 does not reflect in arr2.
+
+So the initial and final state of arr2 and arr3 will be:
+```
+initial
+arr2 = [1, 2, 3, 4, 1, 2, 25, 4, 5]
+arr3 = [2, 25]
+
+Final
+arr2 = [1, 2, 3, 4, 1, 2, 25, 82, 83]
+arr3 = [2, 25, 82, 83, 84]
+```
+
+### Copying a slice
+If you wish that the above should not happen, then you can copy slices with their memory addresses as well using the copy function.
+```go
+myarr1 := []int{1, 2, 3, 4, 5, 6, 7, 8}
+myarr2 := myarr1[5:7]
+var myarr2Copy = make([]int, len(myarr2))
+copy(myarr2Copy, myarr2)
+```
+Here we used 2 functions, make and copy. We will discuss more about make later. But for now, make is a way to declare variables as well as allows to declare the length and capacity as well.
+
+We declared a ```myarr2Copy``` variable which has same length as of myarr2. Then we used the copy function to copy values from ```myarr2``` to ```myarr2Copy```. Since we have already declared the ```myarr2Copy``` variable, it's address will be different as of ```myarr2``` or ```myarr1```.
+
+So now if you append to ```myarr2Copy```
+```go
+fmt.Println(myarr2Copy, myarr2, myarr1)
+myarr2Copy = append(myarr2Copy, 9, 10, 11)
+fmt.Println(myarr2Copy, myarr2, myarr1)
+```
+This should not update myarr2 or myarr1 and only myarr2Copy will be appended.
+
+## Make Function
+
 
 ## Importing External Packages
 
