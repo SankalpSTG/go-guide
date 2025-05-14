@@ -110,11 +110,11 @@ y := "My name is awesome!"
 
 You can declare arrays in go using following syntax
 ```go
-var myArr = [4]int{1, 2, 3, 4}								//fixed length
-var myArr2 = [...]int{1, 2, 3, 4, 5}					//fixed length but dynamic length calculation
-var myArr2 = [8]int{1, 2, 3, 4}								//next 4 values will be zero
-var myArr2 = [5]string{"I", "am", "awesome"}	//next 2 values will be empty strings ""
-var myArr2 = [2]int{1, 2, 3, 4}								//this will cause an error
+var myArr = [4]int{1, 2, 3, 4}  //fixed length
+var myArr2 = [...]int{1, 2, 3, 4, 5}  //fixed length but dynamic length calculation
+var myArr2 = [8]int{1, 2, 3, 4}  //next 4 values will be zero
+var myArr2 = [5]string{"I", "am", "awesome"}  //next 2 values will be empty strings ""
+var myArr2 = [2]int{1, 2, 3, 4}  //this will cause an error
 ```
 As seen above, arrays have a fixed length which can be mentioned while declaration or can be inferred from values while initialization.
 
