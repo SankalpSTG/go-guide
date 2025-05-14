@@ -32,6 +32,41 @@ To view all commands available in go, you can use below command
 ```
 go help
 ```
+## Variables in Go
+Variables in go can be declared using either of following ways
+```go
+var x = 5
+y := 10
+```
+The ```:=``` is a shortcut operator to declare variables, we will discuss more on this later. If you wish to declare variable with types you can also do that
+```go
+var x int
+```
+This will declare a variable without initializing. You can also declare / initialize variables in bulk.
+```go
+var (
+	c = 10
+	d = 20
+	e = 30
+)
+fmt.Println(c, d, e)
+var (
+	f int
+	g int
+	h int
+)
+fmt.Println(f, g, h)
+var i, j, k int
+i = 1
+j = 2
+k = 3
+fmt.Println(i, j, k)
+var l, m, n int = 4, 5, 6
+fmt.Println(l, m, n)
+o, p, q := 1, 2, 3
+fmt.Println(o, p, q)
+```
+
 ## Data Types in Go
 Unlike languages like Python and Javascript, Go is statically typed. That means once a variable type is defined, the variable will only store that type of data.
 
