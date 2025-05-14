@@ -290,7 +290,135 @@ fmt.Println(myarr2Copy, myarr2, myarr1)
 This should not update myarr2 or myarr1 and only myarr2Copy will be appended.
 
 ## Make Function
+Make function let's you declare variables just like var. There are some differences though. Make function has 3 parameters
+```
+make(type, length, capacity)
+```
+The type is the data type to be declared, the length and capacity can be passed in case of slices while for other types, length and capacity is not needed.
 
+Make does not work for primitive types like bool, int and string, but works for slices, struct and map.
+```go
+var x []int
+x[0] = 10 //this will cause an error
+
+x := make([]int, 4)
+x[0] = 10 //this will work
+```
+In the above example, we declared x as []int however with ```var```, we cannot provide the length of the slice. And hence the length of slice will remain zero. So in that case if you index the 0th index that will cause an error.
+
+However, if you see the ```make``` example, we are passing 4 as the length. So x will be a slice with initial length of 4. So it will be safe to access the 0th index.
+
+### For Primitive Data types
+There is an additional way to decalare variables. Look at the below example
+```go
+x := new(int) // intialized as 0
+fmt.Println(*x)
+y := new(string) // initialized as ""
+fmt.Println(*y)
+z := new([4]int) // initialized as [0,0,0,0]
+fmt.Println(*z)
+```
+We can use the new keyword for allocating memory as per data type. However the variables will be pointer variables. We will discuss about pointers later.
+
+## Operators in Go
+Go supports most of the common operators that you see in other languages
+```
+Arithmetic:  +, -, *, /, %, ++, --
+Assignment:  =, +=, -=, *=, /=, %=, &=, |=, ^=, >>=, <<=
+Comparison:  ==, !=, >, <, >=, <=
+Logical:     &&, ||, !
+Bitwise:     &, |, ^, <<, >>
+```
+
+## Conditions in Go
+Writing if else statement remains same as other languages, however we don't use the (round brackets).
+```go
+x= 2
+if x % 2 == 0{
+	fmt.Println("X is Even")
+	return
+}
+fmt.Println("X is Odd")
+```
+Another example
+```go
+if x % 2 == 0{
+	fmt.Println("X is Even")
+}else{
+	fmt.Println("X is Odd")
+}
+```
+If else chaining
+```go
+if x == 0{
+	fmt.Println("X is Zero")
+} else if x % 2 == 0{
+	fmt.Println("X is Even")
+}else{
+	fmt.Println("X is Odd")
+}
+```
+Nested if statement
+```go
+if x % 2 == 0{
+	if x == 0{
+		fmt.Println("X is Zero")
+		return
+	}
+	fmt.Println("X is Even")
+}else{
+	fmt.Println("X is Odd")
+}
+```
+## Switch Case in Go
+Go has switch cases but go has made it better. Look at following example
+```go
+x := 1
+switch x{
+	case 1:
+		fmt.Println("X is 1")
+	case 2:
+		fmt.Println("X is 2")
+	default:
+		fmt.Println("I don't know what X is")
+}
+```
+Notice in the above example, we are not writing break keyword anywhere, as switch cases in go automatically break after the case is finished unlike some other languages.
+
+Switch cases in go also support expressions
+```go
+x := 2
+y := 4
+switch y{
+	case x * 2:
+		fmt.Println("Y is two times X")
+	default:
+		fmt.Println("Default Case")
+}
+```
+Another Example
+```go
+x := 2
+y := 4
+switch y{
+	case "4": //this will cause error
+		fmt.Println("y is 4")
+	default:
+		fmt.Println("Default Case")
+}
+```
+In the above case, case "4" will cause an error as all case expressions should have the same type as of the switch expression.
+
+Swith in go also supports multiple values
+```go
+day := 5
+switch y{
+	case 1, 3, 5: //this will cause error
+		fmt.Println("Day is odd")
+	case 0, 2, 4, 6:
+		fmt.Println("Day is even")
+}
+```
 
 ## Importing External Packages
 

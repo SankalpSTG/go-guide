@@ -29,4 +29,13 @@ func main() {
 	fmt.Println(l, m, n)
 	o, p, q := 1, 2, 3
 	fmt.Println(o, p, q)
+	r := make([]int, 4)
+	r[0] = 10
+	fmt.Println(r)
+	s := new(int) // intialized as 0
+	fmt.Println(*s)
+	t := new(string) // initialized as ""
+	fmt.Println(*t)
+	u := new([4]int) // initialized as [0,0,0,0]
+	fmt.Println(*u)
 }
