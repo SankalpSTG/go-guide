@@ -506,24 +506,24 @@ func functionName(arg1 type, arg2 type, arg3 type){
 ```
 An example
 ```go
-func greetings(greeting string, name string, age number){
+func greetings(greeting string, name string, age int){
 	fmt.Println(greeting, name, "your age is", age)
 }
 func main(){
 	greetings("Welcome", "Rahul", 34)
 }
 ```
-You can also write the function parameters as follows
+You can also write the function parameters combining the types as follows
 ```go
-func greetings(greeting, name, age string){
+func greetings(greeting, name string, age string){
 	fmt.Println(greeting, name, "your age is", age)
 }
 ```
-All three variables will have type string
+Both greeting and name will have type string
 
 Functions can return value as well
 ```go
-func add(a, b) int {
+func add(a, b int) int {
 	return a + b
 }
 func main(){
@@ -533,7 +533,7 @@ func main(){
 ```
 Functions can also return multiple values
 ```go
-func moodyAdder(a, b)(string, int){
+func moodyAdder(a, b int)(string, int){
 	if a % 2 == 0 && b % 2 == 0{
 		return "Happy", a + b
 	}else{
@@ -547,7 +547,7 @@ func main(){
 ```
 Return values can also be named
 ```go
-func moodyAdder(a, b)(mood string, total int){
+func moodyAdder(a, b int)(mood string, total int){
 	if a % 2 == 0 && b % 2 == 0{
 		mood = "Happy"
 		total = a + b
