@@ -160,6 +160,8 @@ var x string = "Hello, World!"
 y := "My name is awesome!"
 ```
 
+### Null
+In Golang, ```null``` is replaced with ```nil```. We will talk more about ``nil`` when discussing pointers and interfaces.
 ## Arrays in Go
 
 You can declare arrays in go using following syntax
@@ -693,6 +695,77 @@ func main() {
 	})
 }
 ```
+## Maps in Go
+A map in go is similar to map in most other languages. Its a key:value pair. The syntax to define a map is as follows
+```
+var varName = map[KeyType]ValueType{key1: value1, key2: value2...}
+OR
+varName := map[KeyType]ValueType{key1: value1, key2: value2...}
+OR
+var varname = make(map[KeyType]ValueType) 
+```
+For example
+```go
+var person = map[string]string{"name": "Sankalp Pol", "gender": "Male"}
+```
+If you use make function to create a map, by default, the map will hold ```nil```
+
+Keys cannot be of following types
+1. Slices
+2. Maps
+3. Functions
+
+The key can hold following types
+1. Booleans
+2. Numbers
+3. Strings
+4. Arrays
+5. Pointers
+6. Structs
+7. Interfaces (should not contain slices, maps and functions)
+
+The invalid key types are invalid because you cannot compare two functions or two slices or two maps using equality operator.
+
+However, those types can be compared to ``nil``
+
+Accessing a map value is similar to accessing an array or slice index, we just replace index with key.
+```go
+var person = map[string]string{"name": "Sankalp", "gender": "Male"}
+fmt.Println(person["name"])
+```
+You can also update or add elements to a map
+```go
+var person = map[string]string{"name": "Sankalp", "gender": "Male"}
+person["name"] = "Kunal" // this updates name
+person["city"] = "Mumbai" // this adds a key "city" with value "Mumbai"
+```
+To delete keys, you can use the delete function
+```go
+var person = map[string]string{"name": "Sankalp", "gender": "Male"}
+delete(person, "name") //name will be deleted
+```
+To check if a key exists, you can use following way
+```go
+func main(){
+	var person = map[string]string{"name": "Sankalp", "gender": "Male"}
+	name, ok := person["name"]
+	if ok != true {
+		fmt.Println("Name doesn't exist")
+	}else{
+		fmt.Println("Name exists as", name)
+	}
+}
+```
+Iterating over a map
+```go
+func main(){
+	var person = map[string]string{"name": "Sankalp", "gender": "Male"}
+	for key, value := range person {
+		fmt.Println(key, value)
+	}
+}
+```
+
 ## Importing External Packages
 
 We will be importing the quote package that you can find at: ```rsc.io/quote```. To import this package, you can run following command
