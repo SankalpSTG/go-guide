@@ -57,7 +57,7 @@ Variables in go can be declared using either of following ways
 var x = 5
 y := 10
 ```
-The ```:=``` is a shortcut operator to declare variables, we will discuss more on this later. If you wish to declare variable with types you can also do that
+The ```:=``` is a shortcut operator to declare variables, we will discuss more on this later. If you wish to declare variable with types you can also do that. However you cannot use ``:=`` outside of a function.
 ```go
 var x int
 ```
@@ -85,7 +85,12 @@ fmt.Println(l, m, n)
 o, p, q := 1, 2, 3
 fmt.Println(o, p, q)
 ```
-
+### Constants
+Go also supports constants
+```go
+const x int = 5
+```
+Go does not allow the ``:=`` operator to define constants
 ## Data Types in Go
 Unlike languages like Python and Javascript, Go is statically typed. That means once a variable type is defined, the variable will only store that type of data.
 
@@ -140,6 +145,17 @@ Similar to int, you have five types of uint
 2. int32 -> 32 bit storing positive values from 0 to 2^32
 2. int64 -> 64 bit storing positive values from 0 to 2^64
 
+There are two aliases for uint8 and int32
+1. btye -> alias for uint8
+2. rune -> alias for int32
+
+```go
+var m rune = -42
+var n byte = 37
+fmt.Println(reflect.TypeOf(m), reflect.TypeOf(n))
+```
+``m`` will be ``int32`` whereas n will be ``uint8``
+
 ### Float
 There are two types of floats
 1. float32 -> 32 bit float storing from -3.4e+38 to 3.4e+38
@@ -159,9 +175,40 @@ Strings can be defined using the ```string``` keyword
 var x string = "Hello, World!"
 y := "My name is awesome!"
 ```
+### Complex
+Go also supports complex numbers as follows
+```go
+a := complex(1.2, 3.4)
+var b complex128 := complex(1.2, 3.4)
+c := 8 + 7i
+```
+Complex numbers is the same mathematical concept where you had a real and an imaginary number. Both the real and imaginary part are floats either float32 or float64.
+
+Complex numbers can be either 128bit or 64bit
+1. complex128 -> 64bit f real + 64bit imaginary
+1. complex64 -> 32bit real + 32bit imaginary
+
+### Zero Values
+Following are the zero values, which are given when variables are declared without initializing
+1. ``0`` for numeric types
+2. ``false`` for boolean type
+3. ``""`` for strings
+
 
 ### Null
 In Golang, ```null``` is replaced with ```nil```. We will talk more about ``nil`` when discussing pointers and interfaces.
+
+## Type Conversions
+You can use type functions to convert between types
+1. int to float using ``float32(int)`` or ``float64(int)``
+2. float to int using ``int(float)`` which is lossy, or ``math.Round(float)`` or ``math.Floor(float)`` or ``math.Ceil(float)`` 
+3. float to string using strconv.FormatFloat(float, decimalFormat, precision, bits) for e.g. strconv.FormatFloat(f, "f", 2, 64). Bits can be 32 or 64. Other way is fmt.Sprintf("$.2f", float) where 2 is the precision. 
+4. int to string using strconv.Itoa(int) and string to int using strconv.Atoi(string)
+5. string to float using strconv.ParseFloat(string, bits) for e.g. strconv.ParseFloat(2, 64). Bits can be 32 or 64.
+
+All the examples can be found in the ``examples/type-conversion`` folder. strconv has additional functions to parse other types like bool and complex.
+
+There are some other type conversions for advanced types like array, struct, interface, maps which we will cover later.
 ## Arrays in Go
 
 You can declare arrays in go using following syntax
@@ -391,6 +438,15 @@ if x % 2 == 0{
 	fmt.Println("X is Odd")
 }
 ```
+If condition can also have a short statement to execute before the function
+```go
+y := 4
+z := 5
+if x:= y * z; x % 2 == 0 {
+	//code for condition
+}
+```
+Since x is defined inside the if condition, the scope of x is limited to if condition and is not accessible outside.
 ## Switch Case in Go
 Go has switch cases but go has made it better. Look at following example
 ```go
@@ -406,12 +462,14 @@ switch x{
 ```
 Notice in the above example, we are not writing break keyword anywhere, as switch cases in go automatically break after the case is finished unlike some other languages.
 
-Switch cases in go also support expressions
+Switch cases in go also support expressions and functions as well
 ```go
 x := 2
 y := 4
 switch y{
 	case x * 2:
+		fmt.Println("Y is two times X")
+	case someFunctions():
 		fmt.Println("Y is two times X")
 	default:
 		fmt.Println("Default Case")
@@ -440,6 +498,18 @@ switch y{
 		fmt.Println("Day is even")
 }
 ```
+You can write switch case without condition as well
+```go
+switch {
+	case x + y == 0:
+		//do something
+	case x < y:
+		//do something
+	case x == y:
+		//do something
+}
+```
+Here, we basically mean ``switch true{}`` so whichever case expression returns true will be executed. However the sequence of execution check will remain from top to bottom.
 
 ## Loops in Go
 Go has for loops that act as while loops as well. For loops takes (up to) three statements
@@ -493,6 +563,12 @@ for _, value := range x {
 }
 for index, _ := range x {
 	fmt.Println(index)
+}
+```
+Running a loop forever
+```go
+for {
+	//This loop will run forever unless it reaches break keyword.
 }
 ```
 ## Functions in Golang
@@ -604,7 +680,22 @@ func factorial(n int) int {
 	return n * factorial(n - 1)
 }
 ```
-
+### Defer keyword
+``defer`` delays the execution of a function until the surrounding function returns.
+```go
+func main(){
+	defer fmt.Println("World!")
+	fmt.Println("Hello")
+}
+```
+Here, world! will be printed after Hello. This is useful in cases where you wish to keep a database connected until the function returns.
+```go
+func main(){
+	defer fmt.Println("World!")
+	defer fmt.Println("Hello")
+}
+```
+``defer`` functions are pushed into a stack. When function returns, the deferred functions are called in LIFO fashion. In this case, Hello will be printed first and then World!.
 ## Struct in Go
 Structs are the most interesting & important part in Golang. Struct is a non-primitive Data Type which allows you to store multiple members of different data types into a single variable. Below is the syntax of defining it
 ```
