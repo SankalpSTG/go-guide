@@ -2,6 +2,25 @@
 
 This guide is a quick learning guide for Go Programming Language. Prerequisites: you should have good knowledge of other programming languages.
 
+## Table Of Contents
+1. [Hello World](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#hello-world)
+2. [Variables in Go](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#variables-in-go)
+3. [Data Types in Go](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#data-types-in-go)
+	1. [Bool](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#bool)
+	2. [Integers](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#integers)
+	3. [Float](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#float)
+	4. [String](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#string)
+4. [Arrays in Go](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#arrays-in-go)
+5. [Slice in Go](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#slice-in-go)
+	1. [Adding Slice to Slice](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#adding-slice-to-slice)
+	2. [Slicing a Slice](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#slicing-a-slice)
+	3. [Copying a Slice](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#copying-a-slice)
+6. [Make Function](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#make-function)
+6. [Operators](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#operators-in-go)
+6. [Conditions](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#conditions-in-go)
+6. [Switch Case](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#switch-case-in-go)
+6. [Loops](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#loops-in-go)
+6. [Functions](https://github.com/SankalpSTG/go-guide?tab=readme-ov-file#functions-in-golang)
 ## Hello World
 
 To initialize a project, you need to write the below command in your project root folder
@@ -584,6 +603,96 @@ func factorial(n int) int {
 }
 ```
 
+## Struct in Go
+Structs are the most interesting & important part in Golang. Struct is a non-primitive Data Type which allows you to store multiple members of different data types into a single variable. Below is the syntax of defining it
+```
+type struct_name struct{
+	member1 datatype;
+	member2 datatype;
+	member3 datatype;
+	member4 datatype;
+}
+``` 
+An example
+```go
+type Person struct {
+	name string;
+	age int;
+	gender string
+}
+```
+Structs can be initialized as follows
+```go
+func main() {
+	me := Person{
+		name:   "Sankalp Pol",
+		age:    42,
+		gender: "Male",
+	}
+}
+```
+The initialized variable can now be used as follows
+```go
+fmt.Println("My name is", me.name, "My age is", me.age, "My gender is", me.gender)
+```
+Struct values can be reinitialized
+```go
+func main() {
+	me := Person{
+		name:   "Sankalp Pol",
+		age:    42,
+		gender: "Male",
+	}
+	fmt.Println("My name is", me.name, "My age is", me.age, "My gender is", me.gender)
+	
+	me.name = "Kunal" // initializing a different name
+	
+	fmt.Println("My name is", me.name, "My age is", me.age, "My gender is", me.gender)
+}
+```
+You can create multiple variables of same struct
+```go
+func main() {
+	me := Person{
+		name:   "Sankalp Pol",
+		age:    42,
+		gender: "Male",
+	}
+
+	you := Person{
+		name:   "Rahul Jaykar",
+		age:    64,
+		gender: "Male",
+	}
+	fmt.Println(me, you)
+}
+```
+Struct variables can be passed to functions as well
+```go
+type Person struct {
+	name   string
+	age    int
+	gender string
+}
+
+func greetPerson(person Person) {
+	fmt.Println("My name is", person.name, "My age is", person.age, "My gender is", person.gender)
+}
+
+func main() {
+	me := Person{
+		name:   "Sankalp Pol",
+		age:    42,
+		gender: "Male",
+	}
+	greetPerson(me)
+	greetPerson(Person{
+		name:   "Kaveri",
+		age:    77,
+		gender: "Female",
+	})
+}
+```
 ## Importing External Packages
 
 We will be importing the quote package that you can find at: ```rsc.io/quote```. To import this package, you can run following command
