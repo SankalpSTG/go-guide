@@ -420,6 +420,170 @@ switch y{
 }
 ```
 
+## Loops in Go
+Go has for loops that act as while loops as well. For loops takes (up to) three statements
+```
+for statement1; statement2; statement3{
+	//write code here
+}
+``` 
+So a normal for loop would look like
+```go
+for i := 1; i <= 10; i++ {
+	fmt.Println(i)
+}
+```
+A while loop would look like
+```go
+i := 1
+for i < 10 {
+	fmt.Println(i)
+	i += 3
+}
+```
+you can use ```continue``` and ```break``` statements to control the loop
+```go
+for i := 1; i <= 10; i++ {
+	if i > 5{
+		break
+	} else if i % 2 == 0{
+		continue
+	}
+	fmt.Println(i)
+}
+```
+To iterate over arrays and slices and maps, you can use for loop as below
+```
+for index, value := range arrat | slice | map{
+	//code
+}
+```
+An example
+```go
+x := []string{"I", "Am", "A", "Legend"}
+for index, value := range x {
+	fmt.Println(index, value)
+}
+```
+In case you only need values or only indexes
+```go
+for _, value := range x {
+	fmt.Println(value)
+}
+for index, _ := range x {
+	fmt.Println(index)
+}
+```
+## Functions in Golang
+To define functions, we use the ``func`` keyword as follows
+```go
+func functionName(){
+	//code
+}
+```
+To call the function you would write the function name with the round brackets as you do in other languages
+```go
+func myFunction(){
+	fmt.Println("myFunction was called")
+}
+func main(){
+	myFunction()
+}
+```
+Following are some rules for function names
+1. A function name must start with a letter
+2. A function name can only contain alpha-numeric characters and underscores (A-z, 0-9, and _ )
+3. Function names are case-sensitive
+4. A function name cannot contain spaces
+5. If the function name consists of multiple words, techniques introduced for multi-word variable naming can be used
+
+### Arguments to functions
+A function can ask for data, you can provide data to the function through arguments.
+```
+func functionName(arg1 type, arg2 type, arg3 type){
+	//code
+}
+```
+An example
+```go
+func greetings(greeting string, name string, age number){
+	fmt.Println(greeting, name, "your age is", age)
+}
+func main(){
+	greetings("Welcome", "Rahul", 34)
+}
+```
+You can also write the function parameters as follows
+```go
+func greetings(greeting, name, age string){
+	fmt.Println(greeting, name, "your age is", age)
+}
+```
+All three variables will have type string
+
+Functions can return value as well
+```go
+func add(a, b) int {
+	return a + b
+}
+func main(){
+	result := add(4, 5)
+	fmt.Println(result)
+}
+```
+Functions can also return multiple values
+```go
+func moodyAdder(a, b)(string, int){
+	if a % 2 == 0 && b % 2 == 0{
+		return "Happy", a + b
+	}else{
+		return "Sad", a - b
+	}
+}
+func main(){
+	mood, result = moodyAdder(5, 4)
+	fmt.Println(mood, result)
+}
+```
+Return values can also be named
+```go
+func moodyAdder(a, b)(mood string, total int){
+	if a % 2 == 0 && b % 2 == 0{
+		mood = "Happy"
+		total = a + b
+	}else{
+		mood = "Sad"
+		total = a - b
+	}
+	return
+	// OR
+	// return mood, total
+}
+```
+While the caller will still call it normally
+```go
+func main(){
+	mood, result = moodyAdder(5, 4)
+	fmt.Println(mood, result)
+}
+```
+Whenever you don't want a particular value you can substitute it with ``_``
+```go
+func main(){
+	mood, _ = moodyAdder(5, 4)
+	fmt.Println(mood)
+}
+```
+Go also supports recursion
+```go
+func factorial(n int) int {
+	if n == 0 || n == 1{
+		return n
+	}
+	return n * factorial(n - 1)
+}
+```
+
 ## Importing External Packages
 
 We will be importing the quote package that you can find at: ```rsc.io/quote```. To import this package, you can run following command
