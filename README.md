@@ -305,6 +305,9 @@ The above example shows how you can add a slice to a slice using the ```...``` o
 ### Slicing a Slice
 ```go
 arr3 := arr2[5:7]
+// arr3 := arr2[:7] // will slice from start upto 7
+// arr3 := arr2[5:] // will slice from 5 till end
+// arr3 := arr2[:] // will slice from start to end
 fmt.Println(arr, arr2, arr3)
 arr3[1] = 25 //Updates original array (arr2) as well but (arr) won't change
 fmt.Println(arr, arr2, arr3)
@@ -696,6 +699,45 @@ func main(){
 }
 ```
 ``defer`` functions are pushed into a stack. When function returns, the deferred functions are called in LIFO fashion. In this case, Hello will be printed first and then World!.
+
+### Functions are values too
+You can store function in a variable and pass it to other functions
+```go
+func execute(a, b int, fn func(int, int) int)int{
+	return fn(a, b)
+}
+func main(){
+	add := func(a, b int) int{
+		return a + b
+	}
+	subtract := func(a, b int) int{
+		return a - b
+	}
+	multiply := func(a, b int) int{
+		return a * b
+	}
+	fmt.Println(execute(4, 2, add))
+	fmt.Println(execute(4, 2, subtract))
+	fmt.Println(execute(4, 2, multiply))
+}
+``` 
+
+### Closures
+When you write a function within another function as below
+```go
+func testSum() func() int {
+	a, b := 5, 10
+	return func() int {
+		return a + b
+	}
+}
+```
+The outer function returns the inner function and the outer function is done. However the inner function still keeps the scope of the outer function. That means, the inner function that is being returned, still has access to a and b, can update it and can use it as long as the function remains in use.
+```go
+x := testSum()
+fmt.Println(x())
+```
+
 ## Struct in Go
 Structs are the most interesting & important part in Golang. Struct is a non-primitive Data Type which allows you to store multiple members of different data types into a single variable. Below is the syntax of defining it
 ```
@@ -856,6 +898,19 @@ func main(){
 	}
 }
 ```
+## Pointers in Go
+Go supports pointers. Pointers are variabes which hold memory address of a value.
+```go
+var p *int
+
+i := 100
+*p = &i
+
+fmt.Println(*p, p)
+```
+Notice the ``*`` before int. That tells that p is a pointer that points to a memory address for int data type. The ``&`` is used to reference the memory address of a variable.
+
+A pointer variable will have a zero value of ``nil``. Go also does not support pointer arithmetic. You can say that pointers in Go are supported to allow pass by reference in Go. We will discuss more about this later.
 
 ## Importing External Packages
 
