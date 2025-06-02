@@ -519,10 +519,173 @@ Context drilling creates a tree structure where a node gets cancelled then the e
 ### Language Features
 #### Q. Why does Go not support generics (older versions)? How has the introduction of generics in Go 1.18 changed things?
 #### Q. What are the restrictions when embedding structs? How does method resolution work in embedded structs?
-#### Q. How does defer work? When is the expression evaluated and when is it executed?
+Restrictions:
 
+1. Only one field with same name. 
+
+    If two parents have same names, you cannot implicitly use them and it will cause selector ambiguity error.
+
+```go
+package main
+
+import "fmt"
+
+type A struct{ Name string }
+type B struct{ Name string }
+type C struct {
+	A
+	B
+}
+
+func main() {
+	x := &C{
+		A: A{
+			Name: "Hello",
+		},
+		B: B{
+			Name: "World",
+		},
+	}
+	// fmt.Println(x.Name)   // compile time error
+	fmt.Println(x.A.Name) // Hello
+	fmt.Println(x.B.Name) // World
+}
+```
+2. You can embed only exported types from other packages (starting with upper case)
+3. Field promotion is recursively shallow
+    
+    If B includes A and C includes B, A's inclusion will not be present in C. This is shallow field promotion.
+    
+    In Go's context, exposed attributes of A will still be accessible directly since Golang will recursively resolve the fileds by first looking into C, then B and then into A. This is recursively shallow field promotion.
+```go
+package main
+
+import "fmt"
+
+type A struct{ FirstName string }
+type B struct {
+	A
+	MiddleName string
+}
+type C struct {
+	B
+	LastName string
+}
+
+func main() {
+	x := &C{
+		B: B{
+			A: A{
+				FirstName: "Hello",
+			},
+			MiddleName: "Ello",
+		},
+		LastName: "Llo",
+	}
+	fmt.Println(x.FirstName)
+	fmt.Println(x.MiddleName)
+	fmt.Println(x.LastName)
+}
+```
+In the above example, `x.FirstName` is possible because Go looks for `FirstName` in `C`, then in `B`, then in `A` where it is found.
+
+Method Resolution Rules:
+
+Method resolution in embedded structs works by promotion and delegation.
+
+1. Promoted methods are accessible as if they belong to the outer struct.
+```go
+type A struct{}
+func (A) Hello() { fmt.Println("Hello from A") }
+
+type B struct {
+    A
+}
+
+b := B{}
+b.Hello() // Calls A.Hello — promoted method
+```
+2. If a method has a pointer receiver, the outer struct must also be a pointer for that method to be accessible. However Go for your convenience interprets value and pointer receivers as per needed.
+```go
+type A struct{}
+
+func (a *A) Speak() { fmt.Println("Pointer method") }
+
+type B struct {
+	A
+}
+
+func main() {
+	b := B{}
+	b.Speak() // here b is converted to (&b).Speak() by Go and no error is thrown
+}
+```
+3. If multiple embedded structs define the same method, the outer struct gets an ambiguity error unless the method is explicitly accessed.
+```go
+type A struct{}
+func (A) Talk() {}
+
+type B struct{}
+func (B) Talk() {}
+
+type C struct {
+    A
+    B
+}
+
+c := C{}
+c.Talk() // Error: Talk is ambiguous
+c.A.Talk() // OK
+```
+#### Q. How does defer work? When is the expression evaluated and when is it executed?
+In Go, defer schedules a function call to be executed after the surrounding function returns.
+1. When the defer statement is encountered, the arguments of the deferred function call are evaluated immediately.
+2. The actual deferred function call is executed later, just before the function returns, in last-in-first-out (LIFO) order if there are multiple deferred calls.
+```go
+func example() {
+    x := 10
+    defer fmt.Println(x)  // 'x' is evaluated now (10), but printed later
+    x = 20
+    fmt.Println("In function:", x) // prints 20
+}
+```
+Output will be
+```
+In function: 20
+10
+```
 ### Package System & Compilation
 #### Q. What is the difference between init() and main()? How are init() functions ordered in execution?
+`init()` function is used to initialize package level initialization before the program starts running and `init()` function is automatically called before `main()` function.
+
+We avoid writing complex setup in `init()`. Maybe you can set up some package level variables and things that will surely not cause error / panic.
+
+Everything else that is complex like Database connections and route config should go into `main()` function itself as these are things that can cause errors and are needed to be handled.
+
+You can write multiple `init()` functions in one package while you can only write one `main()` function.
+```go
+package main
+
+import "fmt"
+
+func init() {
+    fmt.Println("Init 1")
+}
+
+func init() {
+    fmt.Println("Init 2")
+}
+
+func main() {
+    fmt.Println("Main function")
+}
+```
+Output:
+```
+Init 1
+Init 2
+Main function
+```
 #### Q. How does Go handle package dependency resolution and import cycles?
 #### Q. What’s the difference between go run, go build, and go install?
 
@@ -584,4 +747,86 @@ Context drilling creates a tree structure where a node gets cancelled then the e
 
 ### Pragmatic Go (Team Scaling & Prod)
 #### Q. How do you structure large Go projects for modularity and testing?
+```
+/project-root
+│
+├── /cmd/                # Entry points (main packages)
+│   └── app/             # e.g., main.go
+│
+├── /internal/           # Private app logic
+│   ├── /user/           # A module/domain
+│   │   ├── handler.go   # HTTP handlers
+│   │   ├── service.go   # Business logic
+│   │   ├── repository.go # Interface + impl for data access
+│   │   ├── model.go     # Domain models
+│   │   └── service_test.go
+│   └── /auth/
+│
+├── /pkg/                # Public utility packages
+│   └── /logger/
+│
+├── /api/                # OpenAPI/proto definitions
+│
+├── /config/             # App config (YAML/ENV loaders)
+│
+└── go.mod
+```
+1. The application is broken into features / modules where each module has it's own folder. 
+2. In that folder, you will have services and route handlers.
+3. We will use interfaces for abstractions
+4. dependencies are decoupled using dependency injection
+5. Tight coupling between framework and services is avoided. For e.g. we won't be writing gin route handlers in services.
 #### Q. How do you handle shared config/state across packages without global variables?
+In Go, to share config or state across packages without using global variables, you typically use dependency injection via structs and interfaces.
+
+```go
+//config.go
+package config
+
+type AppConfig struct {
+    DBURL      string
+    RedisHost  string
+    SecretKey  string
+}
+```
+The config can be used in other packages while the other packages receive it in their Init methods
+```go
+// service/user.go
+package service
+
+import "myapp/config"
+
+type UserService struct {
+    cfg *config.AppConfig
+}
+
+func InitUserService(cfg *config.AppConfig) *UserService {
+    return &UserService{cfg: cfg}
+}
+
+func (u *UserService) DoSomething() {
+    // access config
+    println(u.cfg.DBURL)
+}
+```
+You will be passing the config to the service in the root level. The struct can be instantiated and passed on to other packages as follows
+```go
+//main.go
+package main
+
+import (
+    "myapp/config"
+    "myapp/service"
+)
+
+func main() {
+    cfg := &config.AppConfig{
+        DBURL:     "postgres://...",
+        RedisHost: "localhost:6379",
+        SecretKey: "supersecret",
+    }
+
+    svc := service.NewUserService(cfg)
+    svc.DoSomething()
+}
+```
